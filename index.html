@@ -226,8 +226,12 @@
             bgStars.rotation.x += 0.0003;
             requestAnimationFrame(animateStars);
         }
+
         animateStars();
         
+        
+
+
         // --- 鼠标交互数据 ---
         let mouseX = 0.5;   // 范围 0-1, 初始中间
         let mouseY = 0.5;
@@ -390,6 +394,10 @@
         
         // 小彩蛋：控制台输出
         console.log('%c✨ 梦幻星云已启动 | 移动鼠标扭曲时空 ✨', 'color: #ff66cc; font-size: 16px;');
+    document.addEventListener('click', function() {
+    console.log('✅ 页面被点击，准备跳转到 first.html');
+    window.location.href = 'first.html';
+    });
     </script>
 </body>
 </html>
