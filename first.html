@@ -3,16 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>星云粒子问答 · 全粒子构成 | 文字即星尘</title>
+    <title>星云粒子问答 · 全粒子构成 | 移动端触控优化</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             font-family: 'Segoe UI', 'Poppins', 'Courier New', monospace;
             background-color: #010010;
-            touch-action: none;
+            touch-action: none; /* 禁止滚动，提升触摸交互精度 */
         }
-        /* 星云智核控制台 - 半透明辅助界面，但问答内容由粒子表现 */
+        /* 移动端引导提示 (点击区域增强) */
+        .mobile-guide {
+            position: absolute;
+            bottom: 110px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            pointer-events: none;
+            z-index: 60;
+            transition: opacity 0.5s;
+        }
+        .guide-bubble {
+            background: rgba(0, 20, 40, 0.85);
+            backdrop-filter: blur(12px);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 60px;
+            color: #8ef;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border: 1px solid rgba(0, 200, 255, 0.7);
+            box-shadow: 0 0 16px rgba(0,160,255,0.4);
+            font-family: monospace;
+        }
+        .guide-bubble span {
+            display: inline-block;
+            background: #0cf33;
+            border-radius: 20px;
+            padding: 0 8px;
+            margin: 0 3px;
+            color: #0cf;
+            font-weight: bold;
+        }
+        @media (max-width: 680px) {
+            .guide-bubble { font-size: 11px; padding: 6px 16px; }
+            .guide-bubble span { padding: 0 6px; }
+        }
+        
+        /* 星云智核控制台 - 半透明界面 */
         .nebula-console {
             position: absolute;
             bottom: 30px;
@@ -20,11 +59,11 @@
             transform: translateX(-50%);
             width: 88%;
             max-width: 560px;
-            background: rgba(6, 10, 28, 0.7);
-            backdrop-filter: blur(16px);
+            background: rgba(6, 10, 28, 0.8);
+            backdrop-filter: blur(18px);
             border-radius: 56px;
-            border: 1px solid rgba(80, 200, 255, 0.6);
-            box-shadow: 0 0 48px rgba(0, 160, 255, 0.3);
+            border: 1px solid rgba(80, 200, 255, 0.7);
+            box-shadow: 0 0 48px rgba(0, 160, 255, 0.4);
             padding: 18px 22px;
             z-index: 40;
             transition: all 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
@@ -43,7 +82,7 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            border-bottom: 1px solid rgba(0, 220, 210, 0.5);
+            border-bottom: 1px solid rgba(0, 220, 210, 0.6);
             margin-bottom: 16px;
             padding-bottom: 8px;
             color: #3ef;
@@ -52,7 +91,7 @@
         }
         .theme-chip {
             font-size: 12px;
-            background: rgba(0, 200, 255, 0.2);
+            background: rgba(0, 200, 255, 0.25);
             padding: 4px 14px;
             border-radius: 30px;
             font-weight: normal;
@@ -63,14 +102,13 @@
             margin-bottom: 18px;
             padding-right: 5px;
             scrollbar-width: thin;
-            /* 聊天文本作为辅助记录，但核心视觉由粒子构成 */
         }
         .chat-window p {
             margin: 10px 0;
             font-size: 13px;
             line-height: 1.4;
             word-break: break-word;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             border-radius: 12px;
             padding: 6px 10px;
         }
@@ -86,10 +124,10 @@
             display: flex;
             gap: 12px;
             align-items: center;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 60px;
             padding: 5px 12px;
-            border: 1px solid rgba(0, 210, 200, 0.5);
+            border: 1px solid rgba(0, 210, 200, 0.6);
         }
         .input-bar input {
             flex: 1;
@@ -102,10 +140,10 @@
             padding: 10px 5px;
         }
         .input-bar input::placeholder {
-            color: rgba(0, 200, 255, 0.6);
+            color: rgba(0, 200, 255, 0.7);
         }
         .input-bar button {
-            background: rgba(0, 200, 255, 0.2);
+            background: rgba(0, 200, 255, 0.3);
             border: none;
             border-radius: 40px;
             color: #0cf;
@@ -114,55 +152,59 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         .input-bar button:active {
             transform: scale(0.95);
-            background: rgba(0, 200, 255, 0.6);
+            background: rgba(0, 200, 255, 0.7);
         }
         .collapse-btn {
             margin-top: 14px;
             text-align: center;
             font-size: 11px;
-            color: rgba(220, 220, 255, 0.7);
+            color: rgba(220, 220, 255, 0.8);
             cursor: pointer;
-            background: rgba(20, 20, 50, 0.7);
+            background: rgba(20, 20, 50, 0.8);
             border-radius: 40px;
             padding: 6px;
             transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         .collapse-btn:active {
-            background: rgba(0, 200, 255, 0.3);
+            background: rgba(0, 200, 255, 0.4);
             color: #0cf;
         }
         .gate-back {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
             padding: 8px 18px;
             border-radius: 40px;
             color: #ccf;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             z-index: 50;
             font-family: monospace;
-            border: 0.5px solid rgba(100, 200, 255, 0.6);
+            border: 0.5px solid rgba(100, 200, 255, 0.8);
             transition: 0.2s;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
         }
         .gate-back:active {
-            background: rgba(0, 200, 255, 0.4);
+            background: rgba(0, 200, 255, 0.5);
             transform: scale(0.96);
         }
-        .nebula-hint {
+        .touch-hint {
             position: absolute;
             bottom: 18px;
             left: 18px;
-            background: rgba(0, 0, 0, 0.45);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(4px);
             border-radius: 20px;
             padding: 4px 12px;
-            font-size: 10px;
+            font-size: 9px;
             color: #bbf;
             pointer-events: none;
             z-index: 45;
@@ -170,13 +212,20 @@
         @media (max-width: 600px) {
             .nebula-console { width: 90%; padding: 14px; }
             .chat-window p { font-size: 11px; }
-            .gate-back { top: 12px; right: 12px; padding: 5px 12px; font-size: 10px; }
+            .gate-back { top: 12px; right: 12px; padding: 6px 14px; font-size: 11px; }
         }
     </style>
 </head>
 <body>
-    <div class="gate-back" id="returnToIndex">🌀 星门 </div>
-    <!-- <div class="nebula-hint">✨ 触碰粒子文字 → 冲击波 · 问答内容均由星云粒子构成</div> -->
+    <div class="gate-back" id="returnToIndex">🌀 星门 · 返航</div>
+    <div class="mobile-guide" id="mobileGuide">
+        <!-- <div class="guide-bubble">
+            ✨ 轻触 <span>SCI-FI</span> · <span>PHILOSOPHY</span> · <span>FUNNY</span> 粒子文字 ✨<br>
+            引爆星云 · 全粒子问答
+        </div> -->
+    </div>
+    <div class="touch-hint" id="touchHint">✨ 粒子即语言 · 触摸文字开启智核</div>
+    
     <div id="oracleConsole" class="nebula-console">
         <div class="console-header">
             <span>✦ 星云粒子核心 ✦</span>
@@ -206,7 +255,7 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         
-        // --- 移动端优化 & 场景搭建 ---
+        // --- 移动端检测 & 性能优化 ---
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x020115);
@@ -222,7 +271,7 @@
         renderer.toneMapping = THREE.ReinhardToneMapping;
         document.body.appendChild(renderer.domElement);
         
-        // 后期 bloom 梦幻星云感
+        // 后期 bloom
         const renderScene = new RenderPass(scene, camera);
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.95, 0.35, 0.7);
         bloomPass.threshold = 0.08;
@@ -231,7 +280,7 @@
         effectComposer.addPass(renderScene);
         effectComposer.addPass(bloomPass);
         
-        // --- 深邃星云背景粒子 (散落感) ---
+        // --- 深邃星云背景粒子 ---
         const starFieldCount = isMobile ? 1800 : 3000;
         const starFieldGeo = new THREE.BufferGeometry();
         const starPositions = [];
@@ -245,7 +294,7 @@
         const starField = new THREE.Points(starFieldGeo, starFieldMat);
         scene.add(starField);
         
-        // 动态星云涡旋粒子 (增强星云质感)
+        // 动态星云涡旋粒子
         const swirlCount = isMobile ? 1000 : 1600;
         const swirlGeo = new THREE.BufferGeometry();
         const swirlPositions = [];
@@ -268,7 +317,7 @@
         const swirlCloud = new THREE.Points(swirlGeo, swirlMat);
         scene.add(swirlCloud);
         
-        // --- 生成粒子文字 (星云粒子排列) 并存储原始坐标用于坍缩重聚 ---
+        // --- 生成粒子文字 (星云粒子排列) ---
         function createParticleWord(word, baseHue, hueVar = 0.22, particleSize = 0.11, offset = { x: 0, y: 0, z: 0 }) {
             const canvas = document.createElement('canvas');
             canvas.width = 620;
@@ -316,8 +365,7 @@
         ];
         
         const wordParticleSystems = [];
-        const allMovableParticles = []; // 存储所有需要参与冲击波&坍缩的粒子系统
-        // 存储每个粒子系统的原始位置快照
+        const allMovableParticles = [];
         wordsLibrary.forEach((cfg, idx) => {
             const { points, positions, colors } = createParticleWord(cfg.name, cfg.hue, cfg.var, cfg.size, cfg.offset);
             scene.add(points);
@@ -332,7 +380,7 @@
             });
         });
         
-        // 增加漂浮星尘 (散落粒子)
+        // 漂浮星尘
         const dustCount = isMobile ? 1300 : 2200;
         const dustGeo = new THREE.BufferGeometry();
         const dustPosArray = [];
@@ -351,7 +399,7 @@
             velocities: null
         });
         
-        // 星云光环粒子 (增强星云环绕感)
+        // 星云光环粒子
         const ringCount = isMobile ? 800 : 1300;
         const ringGeom = new THREE.BufferGeometry();
         const ringPositions = [];
@@ -380,8 +428,7 @@
             velocities: null
         });
         
-        // --- 核心: 将文本转化为粒子文字特效 (问答内容完全由星云粒子构成) ---
-        // 此函数接收一个字符串, 在3D空间中生成一组粒子文字, 并缓慢上升消散
+        // --- 粒子消息特效 (问答粒子文字) ---
         function createParticleMessage(text, hueBaseOffset = 0.0, lifespan = 2800, yOffsetStart = 0.5) {
             const canvas = document.createElement('canvas');
             canvas.width = 800;
@@ -389,24 +436,21 @@
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            const fontSize = 52;
+            let fontSize = 52;
             ctx.font = `${fontSize}px "Segoe UI", "Poppins", "Courier New"`;
             ctx.fillStyle = '#fff';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            
-            // 自适应换行简单处理 (超过20字符缩小字体)
-            let displayText = text;
             if (text.length > 28) {
                 ctx.font = `42px "Segoe UI", "Poppins", monospace`;
             }
-            ctx.fillText(displayText, canvas.width/2, canvas.height/2);
+            ctx.fillText(text, canvas.width/2, canvas.height/2);
             
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
             const positions = [];
             const colors = [];
-            const step = 4; // 粒子采样密度
+            const step = 4;
             const scaleX = 0.006;
             const scaleY = 0.005;
             for (let y = 0; y < canvas.height; y += step) {
@@ -417,7 +461,6 @@
                         const py = (canvas.height/2 - y) * scaleY;
                         const pz = (Math.random() - 0.5) * 0.25;
                         positions.push(px, py + yOffsetStart, pz + 1.2);
-                        // 根据主题取得主色调
                         let baseHue = currentTheme === 'SCI-FI' ? 0.58 : (currentTheme === 'PHILOSOPHY' ? 0.82 : 0.12);
                         const hue = (baseHue + hueBaseOffset + (Math.random() - 0.5) * 0.2) % 1.0;
                         const col = new THREE.Color().setHSL(hue, 1.0, 0.7);
@@ -434,10 +477,9 @@
             scene.add(particleGroup);
             
             const startTime = performance.now();
-            let life = 1.0;
             function animateParticleMessage(now) {
                 const elapsed = now - startTime;
-                life = Math.max(0, 1 - elapsed / lifespan);
+                const life = Math.max(0, 1 - elapsed / lifespan);
                 material.opacity = life;
                 particleGroup.position.y += 0.006;
                 particleGroup.rotation.y += 0.01;
@@ -453,7 +495,6 @@
             return particleGroup;
         }
         
-        // 输入框粒子特效: 当用户输入时，每个按键产生细小粒子流，体现“输入的内容由星云粒子构成”
         function addInputParticleEffect(char) {
             if (!char || char.length === 0) return;
             const canvas = document.createElement('canvas');
@@ -503,10 +544,11 @@
             requestAnimationFrame(fade);
         }
         
-        // --- 交互: 点击粒子文字触发冲击波 ---
+        // --- 交互点击区 (扩大碰撞箱，提升移动端命中率) ---
         const clickZones = [];
         wordsLibrary.forEach((cfg, idx) => {
-            const boxGeo = new THREE.BoxGeometry(3.2, 1.7, 0.9);
+            // 扩大碰撞区域：宽度4.0，高度2.2，深度1.2，确保移动端更容易点中
+            const boxGeo = new THREE.BoxGeometry(4.0, 2.2, 1.2);
             const boxMat = new THREE.MeshBasicMaterial({ visible: false });
             const mesh = new THREE.Mesh(boxGeo, boxMat);
             mesh.position.set(cfg.offset.x, cfg.offset.y, cfg.offset.z);
@@ -557,7 +599,6 @@
             explosionActive = false;
             dialogModeActive = true;
             wordParticleSystems.forEach(sys => sys.points.visible = false);
-            // 所有粒子重组为螺旋光环 (问答背景)
             for (let p of allMovableParticles) {
                 const positions = p.currentPosAttr;
                 const count = p.particleCount;
@@ -577,14 +618,12 @@
             const chatDiv = document.getElementById('chatMessages');
             chatDiv.innerHTML = '';
             const welcomeMsg = getThemeIntro(currentTheme);
-            // 粒子构成欢迎语
             createParticleMessage(welcomeMsg, 0.0, 3200, 0.8);
-            addAIMessage(welcomeMsg); // 保留文字记录
+            addAIMessage(welcomeMsg);
             bloomPass.strength = 1.05;
             setTimeout(() => bloomPass.strength = isMobile ? 0.8 : 0.98, 600);
         }
         
-        // 坍缩动画 (重聚文字)
         function startCollapseAnimation() {
             if (!dialogModeActive || collapseAnimating) return;
             collapseAnimating = true;
@@ -664,7 +703,6 @@
             p.innerHTML = `❯ 你：${msg}`;
             chatDiv.appendChild(p);
             chatDiv.scrollTop = chatDiv.scrollHeight;
-            // 用户消息由粒子构成
             createParticleMessage(`❯ ${msg}`, 0.1, 2800, 0.4);
             ringNebula.material.color.setHex(0xffaa88);
             setTimeout(() => ringNebula.material.color.setHex(0x88aaff), 200);
@@ -677,7 +715,6 @@
             p.innerHTML = `◉ 星云粒子回响：${msg}`;
             chatDiv.appendChild(p);
             chatDiv.scrollTop = chatDiv.scrollHeight;
-            // AI回答完全由星云粒子构成
             createParticleMessage(msg, 0.2, 3600, 0.6);
             bloomPass.strength = 1.12;
             setTimeout(() => bloomPass.strength = isMobile ? 0.85 : 0.98, 400);
@@ -695,7 +732,6 @@
             inputField.value = "";
         });
         inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter' && dialogModeActive) document.getElementById('askNebulaBtn').click(); });
-        // 输入时产生粒子特效
         inputField.addEventListener('input', (e) => {
             if (e.target.value.length > 0 && dialogModeActive) {
                 const lastChar = e.target.value.slice(-1);
@@ -705,22 +741,39 @@
         document.getElementById('collapseToWordsBtn').addEventListener('click', startCollapseAnimation);
         document.getElementById('returnToIndex').addEventListener('click', () => { window.location.href = 'index.html'; });
         
-        // 射线检测
+        // --- 移动端优化：触摸检测（移除多余preventDefault，依赖CSS touch-action）---
         const raycaster = new THREE.Raycaster();
         function handleSelection(event) {
             if (explosionActive || dialogModeActive || collapseAnimating) return;
+            let clientX, clientY;
+            if (event.touches) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
             const rect = renderer.domElement.getBoundingClientRect();
-            const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            const x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
             const intersects = raycaster.intersectObjects(clickZones.map(z => z.mesh));
             if (intersects.length) {
                 const zone = clickZones.find(z => z.mesh === intersects[0].object);
-                if (zone) igniteShockwave(zone.name, zone.idx);
+                if (zone) {
+                    // 移动端增加触感反馈（可选振动）
+                    if (isMobile && navigator.vibrate) navigator.vibrate(50);
+                    igniteShockwave(zone.name, zone.idx);
+                }
             }
         }
+        
+        // 同时监听click和touchstart，touchstart不调用preventDefault以避免干扰，且CSS已阻止滚动
         window.addEventListener('click', handleSelection);
-        window.addEventListener('touchstart', (e) => { if (e.touches.length) handleSelection(e.touches[0]); e.preventDefault(); }, { passive: false });
+        window.addEventListener('touchstart', (e) => {
+            // 不再调用 e.preventDefault()，因为 body 已有 touch-action: none，这样既阻止滚动又保证事件正常触发
+            if (e.touches.length) handleSelection(e);
+        });
         
         // 动画循环
         let timeFlow = 0;
@@ -773,13 +826,15 @@
             effectComposer.render();
         }
         animate();
+        
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             effectComposer.setSize(window.innerWidth, window.innerHeight);
         });
-        console.log('%c✨ 星云粒子圣殿 ✨', 'color: #0cf; font-size: 14px;');
+        
+        console.log('%c✨ 星云粒子圣殿 (移动端触控已优化) ✨', 'color: #0cf; font-size: 14px;');
     </script>
 </body>
 </html>
