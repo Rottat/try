@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>星云粒子问答 · 全粒子构成 | 文字即星尘</title>
+    <title>星云粒子圣殿 · 坍缩与重生</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             font-family: 'Segoe UI', 'Poppins', 'Courier New', monospace;
             background-color: #010010;
-            touch-action: none; /* 禁止滚动，但保留点击/触摸交互 */
+            touch-action: none;
         }
-        /* 星云智核控制台 - 半透明辅助界面，但问答内容由粒子表现 */
+        /* 星云智核控制台 */
         .nebula-console {
             position: absolute;
             bottom: 30px;
@@ -20,10 +20,10 @@
             transform: translateX(-50%);
             width: 88%;
             max-width: 560px;
-            background: rgba(6, 10, 28, 0.75);
-            backdrop-filter: blur(18px);
+            background: rgba(6, 10, 28, 0.82);
+            backdrop-filter: blur(20px);
             border-radius: 56px;
-            border: 1px solid rgba(80, 200, 255, 0.7);
+            border: 1px solid rgba(80, 180, 255, 0.7);
             box-shadow: 0 0 48px rgba(0, 160, 255, 0.4);
             padding: 18px 22px;
             z-index: 40;
@@ -52,7 +52,7 @@
         }
         .theme-chip {
             font-size: 12px;
-            background: rgba(0, 200, 255, 0.25);
+            background: rgba(0, 200, 255, 0.2);
             padding: 4px 14px;
             border-radius: 30px;
             font-weight: normal;
@@ -66,29 +66,29 @@
         }
         .chat-window p {
             margin: 10px 0;
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.4;
             word-break: break-word;
-            background: rgba(0,0,0,0.5);
-            border-radius: 14px;
-            padding: 8px 12px;
         }
         .user-msg {
             color: #bbdaff;
             border-left: 3px solid #0cf;
+            padding-left: 12px;
         }
         .ai-msg {
             color: #ffd7a0;
+            text-shadow: 0 0 3px rgba(255, 160, 80, 0.5);
             border-left: 3px solid #ffaa55;
+            padding-left: 12px;
         }
         .input-bar {
             display: flex;
             gap: 12px;
             align-items: center;
-            background: rgba(0, 0, 0, 0.65);
-            border-radius: 80px;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 60px;
             padding: 5px 12px;
-            border: 1px solid rgba(0, 210, 200, 0.6);
+            border: 1px solid rgba(0, 210, 200, 0.5);
         }
         .input-bar input {
             flex: 1;
@@ -96,19 +96,19 @@
             border: none;
             color: #0cf;
             font-family: monospace;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
-            padding: 12px 6px;
+            padding: 10px 5px;
         }
         .input-bar input::placeholder {
-            color: rgba(0, 200, 255, 0.7);
+            color: rgba(0, 200, 255, 0.6);
         }
         .input-bar button {
-            background: rgba(0, 200, 255, 0.25);
+            background: rgba(0, 200, 255, 0.2);
             border: none;
-            border-radius: 50px;
+            border-radius: 40px;
             color: #0cf;
-            padding: 8px 20px;
+            padding: 6px 18px;
             font-family: monospace;
             font-weight: bold;
             cursor: pointer;
@@ -116,103 +116,79 @@
         }
         .input-bar button:active {
             transform: scale(0.95);
-            background: rgba(0, 200, 255, 0.7);
+            background: rgba(0, 200, 255, 0.6);
         }
         .collapse-btn {
             margin-top: 14px;
             text-align: center;
-            font-size: 12px;
-            color: rgba(220, 220, 255, 0.85);
+            font-size: 11px;
+            color: rgba(220, 220, 255, 0.7);
             cursor: pointer;
-            background: rgba(20, 20, 55, 0.8);
+            background: rgba(20, 20, 50, 0.7);
             border-radius: 40px;
-            padding: 8px;
+            padding: 6px;
             transition: 0.2s;
-            font-weight: 500;
         }
         .collapse-btn:active {
-            background: rgba(0, 200, 255, 0.4);
+            background: rgba(0, 200, 255, 0.3);
             color: #0cf;
         }
         .gate-back {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(8px);
-            padding: 8px 20px;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+            padding: 8px 18px;
             border-radius: 40px;
             color: #ccf;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
-            z-index: 60;
+            z-index: 50;
             font-family: monospace;
-            border: 0.5px solid rgba(100, 200, 255, 0.8);
+            border: 0.5px solid rgba(100, 200, 255, 0.6);
             transition: 0.2s;
-            font-weight: bold;
-            letter-spacing: 1px;
         }
         .gate-back:active {
-            background: rgba(0, 200, 255, 0.5);
+            background: rgba(0, 200, 255, 0.4);
             transform: scale(0.96);
         }
         .nebula-hint {
             position: absolute;
             bottom: 18px;
             left: 18px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(4px);
-            border-radius: 24px;
-            padding: 6px 14px;
-            font-size: 11px;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 10px;
             color: #bbf;
             pointer-events: none;
             z-index: 45;
         }
         @media (max-width: 600px) {
-            .nebula-console { width: 90%; padding: 14px; bottom: 20px; }
-            .chat-window p { font-size: 11px; }
-            .gate-back { top: 12px; right: 12px; padding: 6px 14px; font-size: 11px; }
-            .input-bar input { font-size: 14px; padding: 10px 5px; }
-        }
-        /* 提示文字友好 */
-        .touch-guide {
-            position: absolute;
-            bottom: 100px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            pointer-events: none;
-            z-index: 30;
-            color: #9cf;
-            font-size: 13px;
-            text-shadow: 0 0 6px #06f;
-            background: rgba(0,0,0,0.4);
-            width: fit-content;
-            margin: 0 auto;
-            padding: 5px 15px;
-            border-radius: 40px;
-            backdrop-filter: blur(4px);
-            font-family: monospace;
+            .nebula-console { width: 90%; padding: 14px; }
+            .chat-window p { font-size: 12px; }
+            .gate-back { top: 12px; right: 12px; padding: 5px 12px; font-size: 10px; }
         }
     </style>
 </head>
 <body>
-    <div class="gate-back" id="returnToIndex">🌀 星门</div>
-    <!-- <div class="touch-guide" id="touchGuide">✨ 触碰星尘文字 (SCI-FI / PHILOSOPHY / FUNNY) 开启星云问答 ✨</div> -->
+    <div class="gate-back" id="returnToIndex">🌀 穿越星门 · 返回幻境</div>
+    <div class="nebula-hint">✨ 触碰粒子文字 → 冲击波 · 星云粒子重组问答 | 问答皆由星尘构成</div>
     <div id="oracleConsole" class="nebula-console">
         <div class="console-header">
             <span>✦ 星云粒子核心 ✦</span>
-            <span class="theme-chip" id="currentThemeLabel">—</span>
+            <span class="theme-chip" id="currentThemeLabel">SCI-FI</span>
         </div>
         <div class="chat-window" id="chatMessages">
-            <p class="ai-msg">🌌 星尘凝聚，触碰粒子文字唤醒星云回响...</p>
+            <p class="ai-msg">🌌 星尘凝聚，向星云提问，粒子将编织答案...</p>
         </div>
         <div class="input-bar">
-            <input type="text" id="nebulaInput" placeholder="粒子输入... 你的文字将化为星尘" autocomplete="off">
+            <input type="text" id="nebulaInput" placeholder="向星云粒子发问...">
             <button id="askNebulaBtn">⤦ 星尘回响</button>
         </div>
-        <div class="collapse-btn" id="collapseToWordsBtn">✨ 星云殿堂 ✨</div>
+        <div class="collapse-btn" id="collapseToWordsBtn">↺ 粒子坍缩 · 重聚为文字圣殿</div>
     </div>
 
     <script type="importmap">
@@ -245,7 +221,7 @@
         renderer.toneMapping = THREE.ReinhardToneMapping;
         document.body.appendChild(renderer.domElement);
         
-        // 后期 bloom
+        // 后期 bloom 梦幻星云感
         const renderScene = new RenderPass(scene, camera);
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.95, 0.35, 0.7);
         bloomPass.threshold = 0.08;
@@ -254,7 +230,7 @@
         effectComposer.addPass(renderScene);
         effectComposer.addPass(bloomPass);
         
-        // 背景星群
+        // --- 深邃星云背景粒子 (散落感) ---
         const starFieldCount = isMobile ? 1800 : 3000;
         const starFieldGeo = new THREE.BufferGeometry();
         const starPositions = [];
@@ -268,7 +244,7 @@
         const starField = new THREE.Points(starFieldGeo, starFieldMat);
         scene.add(starField);
         
-        // 动态星云涡旋
+        // 动态星云涡旋粒子 (增强星云质感)
         const swirlCount = isMobile ? 1000 : 1600;
         const swirlGeo = new THREE.BufferGeometry();
         const swirlPositions = [];
@@ -291,7 +267,7 @@
         const swirlCloud = new THREE.Points(swirlGeo, swirlMat);
         scene.add(swirlCloud);
         
-        // 生成粒子文字 (单词)
+        // --- 生成粒子文字 (星云粒子排列) 并存储原始坐标用于坍缩重聚 ---
         function createParticleWord(word, baseHue, hueVar = 0.22, particleSize = 0.11, offset = { x: 0, y: 0, z: 0 }) {
             const canvas = document.createElement('canvas');
             canvas.width = 620;
@@ -332,37 +308,6 @@
             return { points: pointsObj, positions: positions, colors: colors };
         }
         
-        // 生成一个星云团（粒子球体）
-function createNebulaCluster(color, radius, pos, name) {
-    const count = isMobile ? 400 : 800;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-        // 球体内随机分布（偏向表面一点）
-        const r = radius * Math.pow(Math.random(), 1.2);
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        const x = r * Math.sin(phi) * Math.cos(theta);
-        const y = r * Math.sin(phi) * Math.sin(theta);
-        const z = r * Math.cos(phi);
-        positions[i*3] = x + pos.x;
-        positions[i*3+1] = y + pos.y;
-        positions[i*3+2] = z + pos.z;
-        
-        const col = new THREE.Color(color);
-        colors[i*3] = col.r;
-        colors[i*3+1] = col.g;
-        colors[i*3+2] = col.b;
-    }
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    const material = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, blending: THREE.AdditiveBlending });
-    const cluster = new THREE.Points(geometry, material);
-    cluster.userData = { isPortal: true, target: name };
-    return cluster;
-}
-
         const wordsLibrary = [
             { name: 'SCI-FI', hue: 0.58, var: 0.22, offset: { x: -3.5, y: 1.3, z: 0.2 }, size: 0.115 },
             { name: 'PHILOSOPHY', hue: 0.84, var: 0.28, offset: { x: 0.0, y: -0.75, z: 0.45 }, size: 0.105 },
@@ -370,7 +315,8 @@ function createNebulaCluster(color, radius, pos, name) {
         ];
         
         const wordParticleSystems = [];
-        const allMovableParticles = [];
+        const allMovableParticles = []; // 存储所有需要参与冲击波&坍缩的粒子系统
+        // 存储每个粒子系统的原始位置快照
         wordsLibrary.forEach((cfg, idx) => {
             const { points, positions, colors } = createParticleWord(cfg.name, cfg.hue, cfg.var, cfg.size, cfg.offset);
             scene.add(points);
@@ -385,7 +331,7 @@ function createNebulaCluster(color, radius, pos, name) {
             });
         });
         
-        // 漂浮星尘
+        // 增加漂浮星尘 (散落粒子)
         const dustCount = isMobile ? 1300 : 2200;
         const dustGeo = new THREE.BufferGeometry();
         const dustPosArray = [];
@@ -404,7 +350,7 @@ function createNebulaCluster(color, radius, pos, name) {
             velocities: null
         });
         
-        // 星云光环粒子
+        // 星云光环粒子 (增强星云环绕感)
         const ringCount = isMobile ? 800 : 1300;
         const ringGeom = new THREE.BufferGeometry();
         const ringPositions = [];
@@ -433,148 +379,10 @@ function createNebulaCluster(color, radius, pos, name) {
             velocities: null
         });
         
-        // --- 动态粒子消息 (问答粒子文字)
-        function createParticleMessage(text, hueBaseOffset = 0.0, lifespan = 2800, yOffsetStart = 0.5) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 240;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            let fontSize = 52;
-            ctx.font = `${fontSize}px "Segoe UI", "Poppins", "Courier New"`;
-            ctx.fillStyle = '#fff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            let displayText = text;
-            if (text.length > 28) {
-                ctx.font = `42px "Segoe UI", "Poppins", monospace`;
-            }
-            ctx.fillText(displayText, canvas.width/2, canvas.height/2);
-            
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imgData.data;
-            const positions = [];
-            const colors = [];
-            const step = 4;
-            const scaleX = 0.006;
-            const scaleY = 0.005;
-            for (let y = 0; y < canvas.height; y += step) {
-                for (let x = 0; x < canvas.width; x += step) {
-                    const idx = (y * canvas.width + x) * 4;
-                    if (data[idx] > 200) {
-                        const px = (x - canvas.width/2) * scaleX;
-                        const py = (canvas.height/2 - y) * scaleY;
-                        const pz = (Math.random() - 0.5) * 0.25;
-                        positions.push(px, py + yOffsetStart, pz + 1.2);
-                        let baseHue = currentTheme === 'SCI-FI' ? 0.58 : (currentTheme === 'PHILOSOPHY' ? 0.82 : 0.12);
-                        const hue = (baseHue + hueBaseOffset + (Math.random() - 0.5) * 0.2) % 1.0;
-                        const col = new THREE.Color().setHSL(hue, 1.0, 0.7);
-                        colors.push(col.r, col.g, col.b);
-                    }
-                }
-            }
-            if (positions.length === 0) return null;
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
-            const material = new THREE.PointsMaterial({ size: 0.048, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true });
-            const particleGroup = new THREE.Points(geometry, material);
-            scene.add(particleGroup);
-            
-            const startTime = performance.now();
-            function animateParticleMessage(now) {
-                const elapsed = now - startTime;
-                const life = Math.max(0, 1 - elapsed / lifespan);
-                material.opacity = life;
-                particleGroup.position.y += 0.006;
-                particleGroup.rotation.y += 0.01;
-                if (life > 0 && elapsed < lifespan) {
-                    requestAnimationFrame(animateParticleMessage);
-                } else {
-                    scene.remove(particleGroup);
-                    geometry.dispose();
-                    material.dispose();
-                }
-            }
-            requestAnimationFrame(animateParticleMessage);
-            return particleGroup;
-        }
-        
-        function addInputParticleEffect(char) {
-            if (!char || char.length === 0) return;
-            const canvas = document.createElement('canvas');
-            canvas.width = 64;
-            canvas.height = 64;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, 64, 64);
-            ctx.font = `48px monospace`;
-            ctx.fillStyle = '#fff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(char, 32, 32);
-            const imgData = ctx.getImageData(0, 0, 64, 64);
-            const positions = [];
-            const colors = [];
-            for (let y = 0; y < 64; y += 5) {
-                for (let x = 0; x < 64; x += 5) {
-                    const idx = (y * 64 + x) * 4;
-                    if (imgData.data[idx] > 200) {
-                        const px = (x - 32) * 0.02;
-                        const py = (32 - y) * 0.02;
-                        positions.push(px, py + 0.2, (Math.random() - 0.5) * 0.3);
-                        const hue = (currentTheme === 'SCI-FI' ? 0.55 : (currentTheme === 'PHILOSOPHY' ? 0.8 : 0.15)) + (Math.random() - 0.5)*0.15;
-                        const col = new THREE.Color().setHSL(hue, 1.0, 0.7);
-                        colors.push(col.r, col.g, col.b);
-                    }
-                }
-            }
-            if (positions.length === 0) return;
-            const geom = new THREE.BufferGeometry();
-            geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
-            geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
-            const mat = new THREE.PointsMaterial({ size: 0.035, vertexColors: true, blending: THREE.AdditiveBlending });
-            const part = new THREE.Points(geom, mat);
-            scene.add(part);
-            let life = 1.0;
-            const start = performance.now();
-            function fade(now) {
-                const elapsed = now - start;
-                life = Math.max(0, 1 - elapsed / 500);
-                mat.opacity = life;
-                part.position.y += 0.015;
-                if (elapsed < 500) requestAnimationFrame(fade);
-                else scene.remove(part);
-            }
-            requestAnimationFrame(fade);
-        }
-        
-        // 交互区域
+        // --- 交互: 点击粒子文字触发冲击波 (射线检测) ---
         const clickZones = [];
-        // 添加三个星云团（跳转入口）
-        const portalPositions = [
-            { x: -4.5, y: 2.8, z: -1.2, color: 0xff66aa, target: 'new.html', label: '✨ 星云之境 ✨' },
-            { x: 0, y: 3.5, z: -1.5, color: 0x66ffaa, target: 'new1.html', label: '🌠 流光幻境 🌠' },
-            { x: 4.5, y: 2.8, z: -1.2, color: 0xffaa66, target: 'new2.html', label: '🌀 文字神谕 🌀' },
-            { x: -4.5, y: -2.8, z: 1.2, color: 0xff66aa, target: 'new3.html', label: '✨ 混乱之境 ✨' },
-            { x: 0, y: -3.5, z: -1.5, color: 0xff66aa, target: 'new4.html', label: '✨ 世外之境 ✨' },
-            { x: 4.5, y: -2.8, z: -1.2, color: 0xff66aa, target: 'new5.html', label: '✨ 迷失之境 ✨' },
-        ];
-        const portalClusters = [];
-        portalPositions.forEach((p, idx) => {
-            const cluster = createNebulaCluster(p.color, 0.65, { x: p.x, y: p.y, z: p.z }, p.target);
-            scene.add(cluster);
-            portalClusters.push({ mesh: cluster, target: p.target, pos: p });
-            
-            // 可选：添加一个微弱的点光源增强星云团效果
-            const pointLight = new THREE.PointLight(p.color, 0.5, 8);
-            pointLight.position.set(p.x, p.y, p.z);
-            scene.add(pointLight);
-            portalClusters[portalClusters.length-1].light = pointLight;
-        });
         wordsLibrary.forEach((cfg, idx) => {
-            const boxGeo = new THREE.BoxGeometry(3.5, 1.9, 0.9);
+            const boxGeo = new THREE.BoxGeometry(3.2, 1.7, 0.9);
             const boxMat = new THREE.MeshBasicMaterial({ visible: false });
             const mesh = new THREE.Mesh(boxGeo, boxMat);
             mesh.position.set(cfg.offset.x, cfg.offset.y, cfg.offset.z);
@@ -585,8 +393,10 @@ function createNebulaCluster(color, radius, pos, name) {
         let explosionActive = false;
         let dialogModeActive = false;
         let currentTheme = 'SCI-FI';
+        let collapseAnimProgress = null; // 坍缩动画进度 { t, fromPositions, toPositions, systems }
         let collapseAnimating = false;
         
+        // 冲击波: 炸开所有粒子
         function igniteShockwave(themeName, wordIdx) {
             if (explosionActive || dialogModeActive || collapseAnimating) return;
             explosionActive = true;
@@ -616,16 +426,20 @@ function createNebulaCluster(color, radius, pos, name) {
                     p.velocities[ix+2] += (Math.random() - 0.5) * 0.65;
                 }
             }
+            // 0.9秒后 粒子重组为螺旋光环并开启问答模式
             setTimeout(() => {
-                if (explosionActive) enterDialogModeWithNebula();
+                if (explosionActive) {
+                    enterDialogModeWithNebula();
+                }
             }, 880);
         }
         
         function enterDialogModeWithNebula() {
             explosionActive = false;
             dialogModeActive = true;
-            document.getElementById('touchGuide')?.remove();
+            // 隐藏文字粒子系统（不可见）
             wordParticleSystems.forEach(sys => sys.points.visible = false);
+            // 将所有粒子重新排列成美丽的星云旋臂 (问答背景)
             for (let p of allMovableParticles) {
                 const positions = p.currentPosAttr;
                 const count = p.particleCount;
@@ -640,32 +454,30 @@ function createNebulaCluster(color, radius, pos, name) {
                 }
                 p.ref.geometry.attributes.position.needsUpdate = true;
             }
+            // 显示控制台
             const panel = document.getElementById('oracleConsole');
             panel.classList.add('active');
             const chatDiv = document.getElementById('chatMessages');
             chatDiv.innerHTML = '';
             const welcomeMsg = getThemeIntro(currentTheme);
-            createParticleMessage(welcomeMsg, 0.0, 3200, 0.8);
             addAIMessage(welcomeMsg);
             bloomPass.strength = 1.05;
             setTimeout(() => bloomPass.strength = isMobile ? 0.8 : 0.98, 600);
         }
         
+        // 粒子坍缩重聚动画: 平滑回到原始文字位置
         function startCollapseAnimation() {
-            if (!dialogModeActive || collapseAnimating) {
-                if (!dialogModeActive && !collapseAnimating) {
-                    createParticleMessage("✨ 请先触碰星尘文字 (SCI-FI / PHILOSOPHY / FUNNY) 开启对话 ✨", 0.1, 2500, 0.2);
-                }
-                return;
-            }
+            if (!dialogModeActive || collapseAnimating) return;
             collapseAnimating = true;
             dialogModeActive = false;
             explosionActive = false;
+            // 隐藏问答控制台
             document.getElementById('oracleConsole').classList.remove('active');
+            // 准备归位数据: 所有粒子系统当前的位置数组 与 原始位置数组
             const systemsData = [];
             for (let p of allMovableParticles) {
-                const currentPos = p.currentPosAttr.slice();
-                const targetPos = p.origPos.slice();
+                const currentPos = p.currentPosAttr.slice(); // 复制当前位置
+                const targetPos = p.origPos.slice();        // 原始位置
                 systemsData.push({
                     ref: p,
                     current: currentPos,
@@ -673,29 +485,54 @@ function createNebulaCluster(color, radius, pos, name) {
                     count: p.particleCount
                 });
             }
+            // 文字粒子系统需要恢复可见性
             wordParticleSystems.forEach(sys => sys.points.visible = true);
-            let startTime = performance.now();
-            const duration = 800;
+            let animTime = 0;
+            const duration = 800; // ms
+            const startTime = performance.now();
+            
             function animateCollapse(now) {
                 const elapsed = now - startTime;
                 let t = Math.min(1, elapsed / duration);
-                const ease = 1 - Math.pow(1 - t, 3);
+                const ease = 1 - Math.pow(1 - t, 3); // cubic out
                 for (let data of systemsData) {
                     const posAttr = data.ref.currentPosAttr;
-                    for (let i = 0; i < data.count; i++) {
+                    const cnt = data.count;
+                    for (let i = 0; i < cnt; i++) {
                         const ix = i * 3;
-                        posAttr[ix] = data.current[ix] + (data.target[ix] - data.current[ix]) * ease;
-                        posAttr[ix+1] = data.current[ix+1] + (data.target[ix+1] - data.current[ix+1]) * ease;
-                        posAttr[ix+2] = data.current[ix+2] + (data.target[ix+2] - data.current[ix+2]) * ease;
+                        const origCurr = data.current[ix];
+                        const origCurrY = data.current[ix+1];
+                        const origCurrZ = data.current[ix+2];
+                        const targetX = data.target[ix];
+                        const targetY = data.target[ix+1];
+                        const targetZ = data.target[ix+2];
+                        posAttr[ix] = origCurr + (targetX - origCurr) * ease;
+                        posAttr[ix+1] = origCurrY + (targetY - origCurrY) * ease;
+                        posAttr[ix+2] = origCurrZ + (targetZ - origCurrZ) * ease;
                     }
                     data.ref.ref.geometry.attributes.position.needsUpdate = true;
                 }
-                if (t < 1) requestAnimationFrame(animateCollapse);
-                else collapseAnimating = false;
+                if (t < 1) {
+                    requestAnimationFrame(animateCollapse);
+                } else {
+                    // 完全归位，确保所有粒子精确在原始位置
+                    for (let data of systemsData) {
+                        const posAttr = data.ref.currentPosAttr;
+                        for (let i = 0; i < data.count; i++) {
+                            const ix = i * 3;
+                            posAttr[ix] = data.target[ix];
+                            posAttr[ix+1] = data.target[ix+1];
+                            posAttr[ix+2] = data.target[ix+2];
+                        }
+                        data.ref.ref.geometry.attributes.position.needsUpdate = true;
+                    }
+                    collapseAnimating = false;
+                }
             }
             requestAnimationFrame(animateCollapse);
         }
         
+        // 主题问答库 (星云粒子构成)
         function getThemeIntro(theme) {
             const intros = {
                 'SCI-FI': '⚡ 超弦粒子涌动，未来预言层激活。向星云提问，粒子将重组预言。',
@@ -707,9 +544,18 @@ function createNebulaCluster(color, radius, pos, name) {
         
         function getAnswerByTheme(theme, question) {
             const answersDB = {
-                'SCI-FI': { kw: { "未来": "🔮 时间线扰动：三个月内你会迎来创造力的奇点。", "科技": "💡 星辰代码将与量子思维共振。", "宇宙": "🌠 你体内有星尘，渺小却璀璨。" }, defaults: ["🛸 星盟档案：你的选择将扭转熵增。", "🤖 仿生智核预言：大胆行动，宇宙会为你铺路。", "🌌 超光速回响：你将遇见意想不到的盟友。"] },
-                'PHILOSOPHY': { kw: { "意义": "意义是你亲手编织的星图，此刻即是存在。", "幸福": "幸福流动在每粒星光的觉察之间。", "死亡": "死亡赋予粒子闪耀的珍贵。" }, defaults: ["🌿 庄子曰：真实如星云，流动不居，你已在答案中。", "💎 柏拉图低语：你看到的不只是影子，真相即将浮现。", "🌀 老子云：道法自然，此刻疑问即道。"] },
-                'FUNNY': { kw: { "工作": "💼 工作就像星云，远看美丽，近看全是bug。", "钱": "💰 粒子的浪漫：钱不是万能，没钱粒子都会沉默。", "爱情": "💞 爱是两颗星的引力，无法计算却真实存在。" }, defaults: ["🐣 为什么程序员爱星云？因为云原生是浪漫的！", "🍕 检测到幽默波段，建议立刻吃披萨补充欢乐因子。", "🤣 今日星云定律：笑，宇宙也会跟你闪烁。"] }
+                'SCI-FI': {
+                    kw: { "未来": "🔮 时间线扰动：三个月内你会迎来创造力的奇点。", "科技": "💡 星辰代码将与量子思维共振。", "宇宙": "🌠 你体内有星尘，渺小却璀璨。" },
+                    defaults: ["🛸 星盟档案：你的选择将扭转熵增。", "🤖 仿生智核预言：大胆行动，宇宙会为你铺路。", "🌌 超光速回响：你将遇见意想不到的盟友。"]
+                },
+                'PHILOSOPHY': {
+                    kw: { "意义": "意义是你亲手编织的星图，此刻即是存在。", "幸福": "幸福流动在每粒星光的觉察之间。", "死亡": "死亡赋予粒子闪耀的珍贵。" },
+                    defaults: ["🌿 庄子曰：真实如星云，流动不居，你已在答案中。", "💎 柏拉图低语：你看到的不只是影子，真相即将浮现。", "🌀 老子云：道法自然，此刻疑问即道。"]
+                },
+                'FUNNY': {
+                    kw: { "工作": "💼 工作就像星云，远看美丽，近看全是bug。", "钱": "💰 粒子的浪漫：钱不是万能，没钱粒子都会沉默。", "爱情": "💞 爱是两颗星的引力，无法计算却真实存在。" },
+                    defaults: ["🐣 为什么程序员爱星云？因为云原生是浪漫的！", "🍕 检测到幽默波段，建议立刻吃披萨补充欢乐因子。", "🤣 今日星云定律：笑，宇宙也会跟你闪烁。"]
+                }
             };
             const data = answersDB[theme];
             const lowerQ = question.toLowerCase();
@@ -719,6 +565,63 @@ function createNebulaCluster(color, radius, pos, name) {
             return data.defaults[Math.floor(Math.random() * data.defaults.length)];
         }
         
+        // 粒子问答特效: 每次AI回答时，用临时粒子组成简短文字悬浮 (星云粒子构成答案)
+        function showParticleAnswerEffect(answerText) {
+            // 创建飘浮粒子文字特效 (将答案前8个字做成粒子字，增强“由星云粒子构成”的体验)
+            const shortAnswer = answerText.length > 12 ? answerText.slice(0, 10) + '..' : answerText;
+            const canvas = document.createElement('canvas');
+            canvas.width = 400;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `28px "Segoe UI", "Poppins", monospace`;
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(shortAnswer, canvas.width/2, canvas.height/2);
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            const positions = [];
+            const colors = [];
+            const step = 4;
+            for (let y = 0; y < canvas.height; y += step) {
+                for (let x = 0; x < canvas.width; x += step) {
+                    const idx = (y * canvas.width + x) * 4;
+                    if (data[idx] > 200) {
+                        const px = (x / canvas.width) * 2.4 - 1.2;
+                        const py = (1 - y / canvas.height) * 1.2 - 0.6;
+                        const pz = (Math.random() - 0.5) * 0.4;
+                        positions.push(px, py + 1.2, pz + 1.5);
+                        const hue = (currentTheme === 'SCI-FI' ? 0.55 : (currentTheme === 'PHILOSOPHY' ? 0.8 : 0.12)) + (Math.random() - 0.5) * 0.2;
+                        const col = new THREE.Color().setHSL(hue, 1.0, 0.7);
+                        colors.push(col.r, col.g, col.b);
+                    }
+                }
+            }
+            if (positions.length === 0) return;
+            const tempGeo = new THREE.BufferGeometry();
+            tempGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+            tempGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            const tempMat = new THREE.PointsMaterial({ size: 0.045, vertexColors: true, blending: THREE.AdditiveBlending });
+            const tempParticles = new THREE.Points(tempGeo, tempMat);
+            scene.add(tempParticles);
+            let life = 1.0;
+            const start = performance.now();
+            function fadeOut(now) {
+                const elapsed = now - start;
+                life = Math.max(0, 1 - elapsed / 1300);
+                tempMat.opacity = life;
+                tempParticles.position.y += 0.008;
+                if (life > 0 && elapsed < 1300) {
+                    requestAnimationFrame(fadeOut);
+                } else {
+                    scene.remove(tempParticles);
+                    tempGeo.dispose();
+                }
+            }
+            requestAnimationFrame(fadeOut);
+        }
+        
         function addUserMessage(msg) {
             const chatDiv = document.getElementById('chatMessages');
             const p = document.createElement('p');
@@ -726,7 +629,6 @@ function createNebulaCluster(color, radius, pos, name) {
             p.innerHTML = `❯ 你：${msg}`;
             chatDiv.appendChild(p);
             chatDiv.scrollTop = chatDiv.scrollHeight;
-            createParticleMessage(`❯ ${msg}`, 0.1, 2800, 0.4);
             ringNebula.material.color.setHex(0xffaa88);
             setTimeout(() => ringNebula.material.color.setHex(0x88aaff), 200);
         }
@@ -738,101 +640,53 @@ function createNebulaCluster(color, radius, pos, name) {
             p.innerHTML = `◉ 星云粒子回响：${msg}`;
             chatDiv.appendChild(p);
             chatDiv.scrollTop = chatDiv.scrollHeight;
-            createParticleMessage(msg, 0.2, 3600, 0.6);
+            // 粒子构成答案特效
+            showParticleAnswerEffect(msg);
             bloomPass.strength = 1.12;
             setTimeout(() => bloomPass.strength = isMobile ? 0.85 : 0.98, 400);
         }
         
-        // --- 修复移动端交互: 区分DOM元素与canvas射线检测 ---
-        const canvasDom = renderer.domElement;
-        function handleTouchSelection(event) {
-            const targetEl = event.target;
-            // 如果点击的是DOM交互元素 (输入框/按钮/星门/控制台区域)  —> 不干扰默认行为，并且不执行粒子射线检测
-            const interactiveSelectors = ['#nebulaInput', '#askNebulaBtn', '#collapseToWordsBtn', '#returnToIndex', '.gate-back', '.input-bar', '.collapse-btn', '.nebula-console', '.console-header'];
-            let isInteractive = false;
-            for (let sel of interactiveSelectors) {
-                if (targetEl.closest && targetEl.closest(sel)) {
-                    isInteractive = true;
-                    break;
-                }
-            }
-            if (isInteractive) {
-                // 对于输入框不要阻止默认事件，确保获得焦点
-                if (targetEl.closest('#nebulaInput')) {
-                    // 让输入框正常获得焦点
-                    return;
-                }
-                return;
-            }
-            // 否则 canvas区域的触摸 -> 进行射线检测并阻止滚动干扰
-            event.preventDefault();
-            const touch = event.touches ? event.touches[0] : event;
-            if (!touch) return;
-            const rect = canvasDom.getBoundingClientRect();
-            const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
-            const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
-            const intersects = raycaster.intersectObjects(clickZones.map(z => z.mesh));
-            if (intersects.length) {
-                const zone = clickZones.find(z => z.mesh === intersects[0].object);
-                if (zone && !explosionActive && !dialogModeActive && !collapseAnimating) {
-                    igniteShockwave(zone.name, zone.idx);
-                }
-            }
-        }
-        
-        const raycaster = new THREE.Raycaster();
-        window.addEventListener('touchstart', handleTouchSelection, { passive: false });
-        window.addEventListener('click', (event) => {
-            // 桌面click兼容，但对DOM元素不做射线检测
-            const targetEl = event.target;
-            if (targetEl.closest && (targetEl.closest('#nebulaInput') || targetEl.closest('#askNebulaBtn') || targetEl.closest('#collapseToWordsBtn') || targetEl.closest('#returnToIndex'))) return;
-            if (dialogModeActive || explosionActive || collapseAnimating) return;
-            const rect = canvasDom.getBoundingClientRect();
-            const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
-            const intersects = raycaster.intersectObjects(clickZones.map(z => z.mesh));
-            const portalIntersects = raycaster.intersectObjects(portalClusters.map(c => c.mesh));
-if (portalIntersects.length > 0) {
-    const hit = portalClusters.find(c => c.mesh === portalIntersects[0].object);
-    if (hit && !explosionActive && !dialogModeActive && !collapseAnimating) {
-        window.location.href = hit.target;
-    }
-    return;
-}
-            if (intersects.length) {
-                const zone = clickZones.find(z => z.mesh === intersects[0].object);
-                if (zone) igniteShockwave(zone.name, zone.idx);
-            }
-        });
-        
-        // UI 交互绑定
-        const inputField = document.getElementById('nebulaInput');
-        const askBtn = document.getElementById('askNebulaBtn');
-        askBtn.addEventListener('click', () => {
-            if (!dialogModeActive) {
-                createParticleMessage("🌀 请先触碰星尘文字 (SCI-FI / PHILOSOPHY / FUNNY) 唤醒星云...", 0.0, 2200, 0.3);
-                return;
-            }
-            const q = inputField.value.trim();
+        // UI 绑定
+        document.getElementById('askNebulaBtn').addEventListener('click', () => {
+            if (!dialogModeActive) return;
+            const input = document.getElementById('nebulaInput');
+            const q = input.value.trim();
             if (q === "") return;
             addUserMessage(q);
             const ans = getAnswerByTheme(currentTheme, q);
             addAIMessage(ans);
-            inputField.value = "";
+            input.value = "";
         });
-        inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter' && dialogModeActive) askBtn.click(); });
-        inputField.addEventListener('input', (e) => {
-            if (dialogModeActive && e.target.value.length > 0) {
-                const lastChar = e.target.value.slice(-1);
-                if (lastChar && lastChar !== ' ') addInputParticleEffect(lastChar);
-            }
+        document.getElementById('nebulaInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && dialogModeActive) document.getElementById('askNebulaBtn').click();
         });
         document.getElementById('collapseToWordsBtn').addEventListener('click', startCollapseAnimation);
-        document.getElementById('returnToIndex').addEventListener('click', () => { window.location.href = 'index.html'; });
+        document.getElementById('returnToIndex').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
         
-        // 动画 & 相机运动
+        // 射线检测
+        const raycaster = new THREE.Raycaster();
+        function handleSelection(event) {
+            if (explosionActive || dialogModeActive || collapseAnimating) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+            const intersects = raycaster.intersectObjects(clickZones.map(z => z.mesh));
+            if (intersects.length) {
+                const hit = intersects[0].object;
+                const zone = clickZones.find(z => z.mesh === hit);
+                if (zone) igniteShockwave(zone.name, zone.idx);
+            }
+        }
+        window.addEventListener('click', handleSelection);
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length) handleSelection(e.touches[0]);
+            e.preventDefault();
+        }, { passive: false });
+        
+        // 动画循环: 冲击波物理 & 背景旋转
         let timeFlow = 0;
         function updateMotion() {
             if (explosionActive) {
@@ -852,6 +706,7 @@ if (portalIntersects.length > 0) {
                     p.ref.geometry.attributes.position.needsUpdate = true;
                 }
             } else if (!dialogModeActive && !collapseAnimating) {
+                // 初始自由漂浮
                 ringNebula.rotation.y += 0.0015;
                 ringNebula.rotation.x = Math.sin(timeFlow * 0.2) * 0.03;
                 swirlCloud.rotation.y += 0.0007;
@@ -866,6 +721,7 @@ if (portalIntersects.length > 0) {
                 swirlCloud.rotation.z += 0.002;
             }
             timeFlow += 0.016;
+            // 镜头微动
             if (!dialogModeActive && !explosionActive) {
                 camera.position.x += (0 - camera.position.x) * 0.03;
                 camera.position.y += (1.0 - camera.position.y) * 0.03;
@@ -883,13 +739,15 @@ if (portalIntersects.length > 0) {
             effectComposer.render();
         }
         animate();
+        
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             effectComposer.setSize(window.innerWidth, window.innerHeight);
         });
-        console.log('%c✨ 星云粒子圣殿 ✨', 'color: #0cf; font-size: 14px;');
+        
+        console.log('%c✨ 星云粒子圣殿 | 文字由星尘构成 · 冲击波⇒粒子问答·坍缩重聚动画 ✨', 'color: #0cf; font-size: 14px;');
     </script>
 </body>
 </html>

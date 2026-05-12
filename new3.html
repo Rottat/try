@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>星云粒子圣殿 · 文字尘寰 | 冲击波重构问答</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Poppins', 'Courier New', monospace;
+            background-color: #010018;
+            touch-action: none;
+        }
+        /* 全息问答控制台 — 星云之心 */
+        .oracle-core {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 88%;
+            max-width: 560px;
+            background: rgba(8, 12, 28, 0.82);
+            backdrop-filter: blur(20px);
+            border-radius: 56px;
+            border: 1px solid rgba(0, 255, 210, 0.6);
+            box-shadow: 0 0 50px rgba(0, 200, 255, 0.3);
+            padding: 18px 22px;
+            z-index: 40;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            visibility: hidden;
+            font-family: monospace;
+            pointer-events: none;
+        }
+        .oracle-core.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            bottom: 45px;
+        }
+        .core-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid rgba(0, 255, 200, 0.5);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            color: #2ef;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .theme-badge {
+            font-size: 12px;
+            background: rgba(0, 200, 255, 0.2);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: normal;
+        }
+        .chat-stream {
+            max-height: 260px;
+            overflow-y: auto;
+            margin-bottom: 18px;
+            padding-right: 5px;
+            scrollbar-width: thin;
+        }
+        .chat-stream p {
+            margin: 10px 0;
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .user-line {
+            color: #bbd9ff;
+            border-left: 3px solid #0cf;
+            padding-left: 12px;
+        }
+        .ai-line {
+            color: #ffcf9a;
+            text-shadow: 0 0 4px rgba(255,160,80,0.6);
+            border-left: 3px solid #ffaa55;
+            padding-left: 12px;
+        }
+        .question-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 60px;
+            padding: 5px 12px;
+            border: 1px solid rgba(0, 255, 200, 0.4);
+        }
+        .question-area input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #0cf;
+            font-family: monospace;
+            font-size: 14px;
+            outline: none;
+            padding: 10px 5px;
+        }
+        .question-area input::placeholder {
+            color: rgba(0, 200, 255, 0.6);
+        }
+        .question-area button {
+            background: rgba(0, 200, 255, 0.2);
+            border: none;
+            border-radius: 40px;
+            color: #0cf;
+            padding: 6px 18px;
+            font-family: monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .question-area button:active {
+            transform: scale(0.95);
+            background: rgba(0, 200, 255, 0.6);
+        }
+        .return-star {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,200,0.6);
+            cursor: pointer;
+            background: rgba(20,20,40,0.6);
+            border-radius: 40px;
+            padding: 6px;
+            transition: 0.2s;
+        }
+        .return-star:active {
+            background: rgba(0, 255, 200, 0.25);
+            color: #0cf;
+        }
+        .back-portal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: #ccf;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 50;
+            font-family: monospace;
+            border: 0.5px solid rgba(255,255,200,0.4);
+            transition: 0.2s;
+        }
+        .back-portal:active {
+            background: rgba(0,200,255,0.3);
+            transform: scale(0.96);
+        }
+        .instruction-dust {
+            position: absolute;
+            bottom: 18px;
+            left: 18px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 10px;
+            color: #aaf;
+            pointer-events: none;
+            z-index: 45;
+        }
+        @media (max-width: 600px) {
+            .oracle-core { width: 90%; padding: 14px; }
+            .chat-stream p { font-size: 12px; }
+            .back-portal { top: 12px; right: 12px; padding: 5px 12px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="back-portal" id="backToIndexBtn">✨ 穿越星门 · 返回星云幻境</div>
+    <div class="instruction-dust">🌌 触碰粒子文字 → 冲击波 · 星云粒子重组问答</div>
+    <div id="oraclePanel" class="oracle-core">
+        <div class="core-header">
+            <span>✦ 星云粒子核心 ✦</span>
+            <span class="theme-badge" id="activeThemeName">SCI-FI</span>
+        </div>
+        <div class="chat-stream" id="dialogStream">
+            <p class="ai-line">✨ 星尘聚合完成，向星云发问即获粒子回响...</p>
+        </div>
+        <div class="question-area">
+            <input type="text" id="questionField" placeholder="输入问题，星云粒子将重组答案...">
+            <button id="sendBtn">⤦ 问询</button>
+        </div>
+        <div class="return-star" id="resetToParticlesBtn">↺ 重返星云文字 — 粒子归位</div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        
+        // --- 移动端优化 & 初始化 ---
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const PARTICLE_DENSITY = isMobile ? 0.7 : 1.0;
+        
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020115);
+        scene.fog = new THREE.FogExp2(0x020115, 0.006);
+        
+        const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 1.2, 14);
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: !isMobile });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        document.body.appendChild(renderer.domElement);
+        
+        // 后期 bloom 增强星云感
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.95, 0.4, 0.65);
+        bloomPass.threshold = 0.08;
+        bloomPass.strength = isMobile ? 0.7 : 1.0;
+        const effectComposer = new EffectComposer(renderer);
+        effectComposer.addPass(renderScene);
+        effectComposer.addPass(bloomPass);
+        
+        // 简易相机控制（允许轻微环绕，提升立体感）
+        let cameraAngleX = 0;
+        let cameraAngleY = 0;
+        let targetCamPos = { x: 0, y: 1.2, z: 14 };
+        let autoOrbit = true;
+        
+        // --- 星云背景粒子场 (散落深邃星尘) ---
+        const bgStarCount = isMobile ? 1600 : 2800;
+        const bgStarGeo = new THREE.BufferGeometry();
+        const bgStarPos = [];
+        for (let i = 0; i < bgStarCount; i++) {
+            bgStarPos.push((Math.random() - 0.5) * 220);
+            bgStarPos.push((Math.random() - 0.5) * 120);
+            bgStarPos.push((Math.random() - 0.5) * 100 - 40);
+        }
+        bgStarGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(bgStarPos), 3));
+        const bgStarMat = new THREE.PointsMaterial({ color: 0x88aaff, size: isMobile ? 0.08 : 0.12, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
+        const bgStars = new THREE.Points(bgStarGeo, bgStarMat);
+        scene.add(bgStars);
+        
+        // 动态星云涡流粒子 (增加色彩星云感)
+        const nebulaCount = isMobile ? 900 : 1500;
+        const nebulaGeo = new THREE.BufferGeometry();
+        const nebulaPositions = [];
+        const nebulaColors = [];
+        for (let i = 0; i < nebulaCount; i++) {
+            const r = 3 + Math.random() ** 1.2 * 5;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta) * 0.7;
+            const z = r * Math.cos(phi) * 1.1;
+            nebulaPositions.push(x, y, z);
+            const hue = 0.55 + Math.random() * 0.4;
+            const col = new THREE.Color().setHSL(hue, 1.0, 0.6);
+            nebulaColors.push(col.r, col.g, col.b);
+        }
+        nebulaGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nebulaPositions), 3));
+        nebulaGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nebulaColors), 3));
+        const nebulaMat = new THREE.PointsMaterial({ size: 0.07, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true });
+        const nebulaCloud = new THREE.Points(nebulaGeo, nebulaMat);
+        scene.add(nebulaCloud);
+        
+        // --- 生成粒子文字 (星云粒子排列组成单词) ---
+        function generateWordParticleSystem(word, baseHue, colorVariety = 0.25, particleSize = 0.11, offset = { x: 0, y: 0, z: 0 }) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 240;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `Bold ${110}px "Segoe UI", "Poppins", "Courier New"`;
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(word, canvas.width/2, canvas.height/2);
+            
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            const positions = [];
+            const colors = [];
+            const step = 3;
+            for (let y = 0; y < canvas.height; y += step) {
+                for (let x = 0; x < canvas.width; x += step) {
+                    const idx = (y * canvas.width + x) * 4;
+                    if (data[idx] > 200) {
+                        const px = (x / canvas.width) * 5.4 - 2.7;
+                        const py = (1 - y / canvas.height) * 2.2 - 1.1;
+                        const pz = (Math.random() - 0.5) * 0.2;
+                        positions.push(px + offset.x, py + offset.y, pz + offset.z);
+                        const hue = (baseHue + (Math.random() - 0.5) * colorVariety) % 1.0;
+                        const col = new THREE.Color().setHSL(hue, 1.0, 0.7);
+                        colors.push(col.r, col.g, col.b);
+                    }
+                }
+            }
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            const material = new THREE.PointsMaterial({ size: particleSize, vertexColors: true, blending: THREE.AdditiveBlending });
+            const pointsObj = new THREE.Points(geometry, material);
+            return { points: pointsObj, positions: positions, colors: colors };
+        }
+        
+        const wordData = [
+            { name: 'SCI-FI', hue: 0.57, var: 0.2, offset: { x: -3.4, y: 1.3, z: 0.2 }, size: 0.12 },
+            { name: 'PHILOSOPHY', hue: 0.82, var: 0.28, offset: { x: 0.0, y: -0.7, z: 0.4 }, size: 0.11 },
+            { name: 'FUNNY', hue: 0.12, var: 0.22, offset: { x: 3.2, y: 1.1, z: 0.1 }, size: 0.12 }
+        ];
+        
+        const wordSystems = [];
+        const allDynamicParticles = []; // 存储所有粒子对象用于冲击波动效
+        
+        wordData.forEach((cfg, idx) => {
+            const { points, positions, colors } = generateWordParticleSystem(cfg.name, cfg.hue, cfg.var, cfg.size, cfg.offset);
+            scene.add(points);
+            wordSystems.push({ points, name: cfg.name, hue: cfg.hue, offset: cfg.offset, origPositions: positions.slice() });
+            allDynamicParticles.push({
+                ref: points,
+                origPos: positions.slice(),
+                positionsAttr: points.geometry.attributes.position.array,
+                colorAttr: points.geometry.attributes.color.array,
+                count: positions.length / 3,
+                velocities: null
+            });
+        });
+        
+        // 增加漂浮精灵尘 (散落粒子，增强初始星云粒子散落感)
+        const dustCount = isMobile ? 1100 : 2000;
+        const dustGeo2 = new THREE.BufferGeometry();
+        const dustPos2 = [];
+        for (let i = 0; i < dustCount; i++) {
+            dustPos2.push((Math.random() - 0.5) * 16, (Math.random() - 0.5) * 12, (Math.random() - 0.5) * 15 - 4);
+        }
+        dustGeo2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(dustPos2), 3));
+        const dustMat2 = new THREE.PointsMaterial({ color: 0x99ccff, size: 0.045, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+        const starDust = new THREE.Points(dustGeo2, dustMat2);
+        scene.add(starDust);
+        allDynamicParticles.push({
+            ref: starDust,
+            origPos: dustPos2.slice(),
+            positionsAttr: starDust.geometry.attributes.position.array,
+            count: dustCount,
+            velocities: null
+        });
+        // 环状星云粒子加入
+        const ringCount = isMobile ? 700 : 1200;
+        const ringGeo = new THREE.BufferGeometry();
+        const ringPosArr = [];
+        const ringColorArr = [];
+        for (let i = 0; i < ringCount; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const rad = 2.2 + Math.random() * 1.5;
+            const x = Math.cos(ang) * rad;
+            const z = Math.sin(ang) * rad;
+            const y = Math.sin(ang * 2.5) * 0.7;
+            ringPosArr.push(x, y, z);
+            const hueRing = 0.5 + Math.random() * 0.4;
+            const colRing = new THREE.Color().setHSL(hueRing, 1.0, 0.65);
+            ringColorArr.push(colRing.r, colRing.g, colRing.b);
+        }
+        ringGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPosArr), 3));
+        ringGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(ringColorArr), 3));
+        const ringPointsMat = new THREE.PointsMaterial({ size: 0.06, vertexColors: true, blending: THREE.AdditiveBlending });
+        const ringNebula = new THREE.Points(ringGeo, ringPointsMat);
+        scene.add(ringNebula);
+        allDynamicParticles.push({
+            ref: ringNebula,
+            origPos: ringPosArr.slice(),
+            positionsAttr: ringNebula.geometry.attributes.position.array,
+            count: ringCount,
+            velocities: null
+        });
+        
+        // --- 点击检测 ( Raycaster ) ---
+        const helperBoxes = [];
+        wordData.forEach((cfg, idx) => {
+            const boxGeo = new THREE.BoxGeometry(3.0, 1.6, 0.8);
+            const boxMat = new THREE.MeshBasicMaterial({ visible: false });
+            const mesh = new THREE.Mesh(boxGeo, boxMat);
+            mesh.position.set(cfg.offset.x, cfg.offset.y, cfg.offset.z);
+            scene.add(mesh);
+            helperBoxes.push({ mesh, idx, name: cfg.name });
+        });
+        
+        let shockwaveActive = false;
+        let isDialogMode = false;
+        let activeTheme = 'SCI-FI';
+        let shockwaveTime = 0;
+        
+        // 冲击波触发：搅乱所有粒子，向外飞散
+        function triggerShockwave(themeName, wordIdx) {
+            if (shockwaveActive || isDialogMode) return;
+            shockwaveActive = true;
+            activeTheme = themeName;
+            document.getElementById('activeThemeName').innerText = themeName;
+            // 为每个动态粒子赋予爆炸速度
+            const centerPos = wordData[wordIdx].offset;
+            for (let p of allDynamicParticles) {
+                const positions = p.positionsAttr;
+                const count = p.count;
+                if (!p.velocities) p.velocities = new Array(count * 3).fill(0);
+                for (let i = 0; i < count; i++) {
+                    const ix = i * 3;
+                    const px = positions[ix];
+                    const py = positions[ix+1];
+                    const pz = positions[ix+2];
+                    let dx = px - centerPos.x;
+                    let dy = py - centerPos.y;
+                    let dz = pz - centerPos.z;
+                    let len = Math.hypot(dx, dy, dz) + 0.2;
+                    let force = 1.6 / (len * 0.5 + 0.2);
+                    force = Math.min(force, 2.0);
+                    p.velocities[ix] = (dx / len) * force * (0.7 + Math.random() * 1.0);
+                    p.velocities[ix+1] = (dy / len) * force * (0.7 + Math.random() * 1.0);
+                    p.velocities[ix+2] = (dz / len) * force * (0.7 + Math.random() * 1.0);
+                    // 增加涡流随机性
+                    p.velocities[ix] += (Math.random() - 0.5) * 0.6;
+                    p.velocities[ix+1] += (Math.random() - 0.5) * 0.6;
+                    p.velocities[ix+2] += (Math.random() - 0.5) * 0.6;
+                }
+            }
+            // 0.9秒后重组问答模式 -> 粒子组合成星云漩涡，显示控制台
+            setTimeout(() => {
+                if (shockwaveActive) {
+                    finishShockwaveAndOpenOracle();
+                }
+            }, 880);
+        }
+        
+        function finishShockwaveAndOpenOracle() {
+            shockwaveActive = false;
+            isDialogMode = true;
+            // 隐藏原有的文字粒子群
+            wordSystems.forEach(sys => sys.points.visible = false);
+            // 让星尘粒子重新组合成漂亮的螺旋光环围绕控制台
+            for (let p of allDynamicParticles) {
+                const positions = p.positionsAttr;
+                const count = p.count;
+                for (let i = 0; i < count; i++) {
+                    const ix = i * 3;
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 2.2 + Math.random() * 2.6;
+                    const yOff = (Math.random() - 0.5) * 2.4;
+                    positions[ix] = Math.cos(angle) * radius;
+                    positions[ix+2] = Math.sin(angle) * radius;
+                    positions[ix+1] = yOff + Math.sin(angle * 2.5) * 0.7;
+                }
+                p.ref.geometry.attributes.position.needsUpdate = true;
+            }
+            // 星云漩涡额外旋转动画标记
+            // 显示问答控制台，伴随粒子组合动画（涡流渐显）
+            const panel = document.getElementById('oraclePanel');
+            panel.classList.add('active');
+            // 清空对话区欢迎语
+            const chatDiv = document.getElementById('dialogStream');
+            chatDiv.innerHTML = '';
+            const welcome = getThemeGreeting(activeTheme);
+            addAIMessage(welcome);
+            // 添加粒子组合特效：临时提升光晕强度
+            bloomPass.strength = 1.0;
+            setTimeout(() => { bloomPass.strength = isMobile ? 0.8 : 0.95; }, 500);
+        }
+        
+        // 主题问答库
+        function getThemeGreeting(theme) {
+            const map = {
+                'SCI-FI': '⚡ 超弦粒子涌动，未来预言层激活。向星云提问，粒子将重组预言。',
+                'PHILOSOPHY': '📜 哲思星云低语，智慧尘环旋转... 你的问题会引出粒子箴言。',
+                'FUNNY': '😂 笑尘星云裂开，幽默粒子正在爆裂重组，请发问！'
+            };
+            return map[theme];
+        }
+        
+        function getAnswerByTheme(theme, question) {
+            const answersDB = {
+                'SCI-FI': {
+                    keywords: { "未来": "🔮 时间线扰动：三个月内你会迎来创造力的奇点。", "科技": "💡 你的代码灵感将与量子思维共振。", "宇宙": "🌠 你体内有星尘，渺小却璀璨。" },
+                    defaults: ["🛸 星盟档案显示：你接下来的选择将扭转熵增。", "🤖 仿生智核预言：大胆行动，宇宙会为你铺路。", "🌌 超光速回响：你即将遇见一位意想不到的盟友。"]
+                },
+                'PHILOSOPHY': {
+                    keywords: { "意义": "意义是你亲手编织的星图，此时此刻即是存在。", "幸福": "幸福流动在每粒星光的觉察之间。", "死亡": "死亡赋予粒子闪耀的珍贵。" },
+                    defaults: ["🌿 庄子曰：真实如星云，流动不居，你已在答案中。", "💎 柏拉图低语：你看到的不只是影子，真相即将浮现。", "🌀 老子云：道法自然，此刻疑问即道。"]
+                },
+                'FUNNY': {
+                    keywords: { "工作": "💼 工作就像星云，远看美丽，近看全是bug。", "钱": "💰 粒子的浪漫：钱不是万能，但没钱粒子都会沉默。", "爱情": "💞 爱是两颗星的引力，无法计算却真实存在。" },
+                    defaults: ["🐣 为什么程序员爱星云？因为云原生是浪漫的！", "🍕 检测到幽默波段，建议立刻吃披萨补充欢乐因子。", "🤣 今日星云定律：笑，宇宙也会跟你闪烁。"]
+                }
+            };
+            const data = answersDB[theme];
+            const lowerQ = question.toLowerCase();
+            for (let [kw, ans] of Object.entries(data.keywords)) {
+                if (lowerQ.includes(kw)) return ans;
+            }
+            return data.defaults[Math.floor(Math.random() * data.defaults.length)];
+        }
+        
+        function addUserMessage(msg) {
+            const chatDiv = document.getElementById('dialogStream');
+            const p = document.createElement('p');
+            p.className = 'user-line';
+            p.innerHTML = `❯ 你：${msg}`;
+            chatDiv.appendChild(p);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            // 粒子闪烁特效：临时改变星云颜色
+            ringNebula.material.color.setHex(0xffaa88);
+            setTimeout(() => ringNebula.material.color.setHex(0x88aaff), 200);
+        }
+        
+        function addAIMessage(msg) {
+            const chatDiv = document.getElementById('dialogStream');
+            const p = document.createElement('p');
+            p.className = 'ai-line';
+            p.innerHTML = `◉ 星云粒子回响：${msg}`;
+            chatDiv.appendChild(p);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            // 回答时粒子流光特效：星尘亮度增强
+            bloomPass.strength = 1.15;
+            setTimeout(() => bloomPass.strength = isMobile ? 0.85 : 1.0, 400);
+        }
+        
+        // 重置粒子圣殿 (退出问答，文字粒子重现)
+        function resetToParticleWorld() {
+            if (!isDialogMode && !shockwaveActive) return;
+            document.getElementById('oraclePanel').classList.remove('active');
+            isDialogMode = false;
+            shockwaveActive = false;
+            wordSystems.forEach(sys => {
+                sys.points.visible = true;
+                const origPos = sys.origPositions;
+                const attr = sys.points.geometry.attributes.position.array;
+                for (let i = 0; i < origPos.length / 3; i++) {
+                    attr[i*3] = origPos[i*3];
+                    attr[i*3+1] = origPos[i*3+1];
+                    attr[i*3+2] = origPos[i*3+2];
+                }
+                sys.points.geometry.attributes.position.needsUpdate = true;
+            });
+            // 重置星尘环到原始位置
+            const ringOrig = allDynamicParticles[allDynamicParticles.length-1].origPos;
+            const ringPosAttr = ringNebula.geometry.attributes.position.array;
+            for (let i=0; i<ringOrig.length/3; i++) {
+                ringPosAttr[i*3]=ringOrig[i*3];
+                ringPosAttr[i*3+1]=ringOrig[i*3+1];
+                ringPosAttr[i*3+2]=ringOrig[i*3+2];
+            }
+            ringNebula.geometry.attributes.position.needsUpdate = true;
+            // 重置星尘
+            const starOrig = allDynamicParticles[allDynamicParticles.length-2].origPos;
+            const starPosAttr = starDust.geometry.attributes.position.array;
+            for (let i=0; i<starOrig.length/3; i++) {
+                starPosAttr[i*3]=starOrig[i*3];
+                starPosAttr[i*3+1]=starOrig[i*3+1];
+                starPosAttr[i*3+2]=starOrig[i*3+2];
+            }
+            starDust.geometry.attributes.position.needsUpdate = true;
+        }
+        
+        // 跳转回index (星云主题跳转丝滑)
+        document.getElementById('backToIndexBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('resetToParticlesBtn').addEventListener('click', resetToParticleWorld);
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            if (!isDialogMode) return;
+            const input = document.getElementById('questionField');
+            const q = input.value.trim();
+            if (q === "") return;
+            addUserMessage(q);
+            const ans = getAnswerByTheme(activeTheme, q);
+            addAIMessage(ans);
+            input.value = "";
+        });
+        document.getElementById('questionField').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('sendBtn').click();
+        });
+        
+        // 注册点击射线检测
+        const raycaster = new THREE.Raycaster();
+        function onCanvasClick(event) {
+            if (shockwaveActive || isDialogMode) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+            const intersects = raycaster.intersectObjects(helperBoxes.map(b => b.mesh));
+            if (intersects.length > 0) {
+                const hit = intersects[0].object;
+                const boxItem = helperBoxes.find(b => b.mesh === hit);
+                if (boxItem) triggerShockwave(boxItem.name, boxItem.idx);
+            }
+        }
+        window.addEventListener('click', onCanvasClick);
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length) {
+                const touch = e.touches[0];
+                onCanvasClick(touch);
+            }
+            e.preventDefault();
+        }, { passive: false });
+        
+        // 动画: 冲击波动态更新 + 漂浮旋转
+        let timeAnim = 0;
+        function updateParticleMotion() {
+            if (shockwaveActive) {
+                for (let p of allDynamicParticles) {
+                    if (!p.velocities) continue;
+                    const posAttr = p.positionsAttr;
+                    const count = p.count;
+                    for (let i = 0; i < count; i++) {
+                        const ix = i * 3;
+                        posAttr[ix] += p.velocities[ix] * 0.16;
+                        posAttr[ix+1] += p.velocities[ix+1] * 0.16;
+                        posAttr[ix+2] += p.velocities[ix+2] * 0.16;
+                        p.velocities[ix] *= 0.96;
+                        p.velocities[ix+1] *= 0.96;
+                        p.velocities[ix+2] *= 0.96;
+                    }
+                    p.ref.geometry.attributes.position.needsUpdate = true;
+                }
+            } else if (!isDialogMode) {
+                // 初始星云粒子自然漂浮
+                ringNebula.rotation.y += 0.002;
+                ringNebula.rotation.x = Math.sin(timeAnim * 0.2) * 0.05;
+                nebulaCloud.rotation.y += 0.0008;
+                starDust.rotation.x += 0.0005;
+                bgStars.rotation.y += 0.0003;
+                wordSystems.forEach((sys, idx) => {
+                    sys.points.rotation.z = Math.sin(timeAnim * 0.6 + idx) * 0.03;
+                });
+            } else {
+                // 问答模式下星云旋绕
+                ringNebula.rotation.y += 0.008;
+                ringNebula.rotation.x = Math.sin(timeAnim) * 0.1;
+                nebulaCloud.rotation.z += 0.002;
+            }
+            timeAnim += 0.018;
+        }
+        
+        function animateCamera() {
+            if (!isDialogMode && !shockwaveActive) {
+                targetCamPos.x += (0 - targetCamPos.x) * 0.03;
+                targetCamPos.y += (1.2 - targetCamPos.y) * 0.03;
+                camera.position.lerp(targetCamPos, 0.05);
+                camera.lookAt(0, 0, 0);
+            } else {
+                camera.position.x += (0 - camera.position.x) * 0.04;
+                camera.position.y += (0.8 - camera.position.y) * 0.04;
+                camera.lookAt(0, 0, 0);
+            }
+        }
+        
+        function renderLoop() {
+            requestAnimationFrame(renderLoop);
+            updateParticleMotion();
+            animateCamera();
+            effectComposer.render();
+        }
+        renderLoop();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            effectComposer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        console.log('%c✨ 星云粒子圣殿 | 文字由星尘构成 · 触碰引爆粒子重构问答 ✨', 'color: #0cf; font-size: 14px;');
+    </script>
+</body>
+</html>
