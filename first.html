@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>无限镜屋 · 诗句万花筒</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Courier New', 'Fira Code', monospace;
+        }
+        #poem {
+            position: absolute;
+            bottom: 15%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 300;
+            text-shadow: 0 0 20px rgba(0,255,255,0.8);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 40px;
+            width: fit-content;
+            margin: 0 auto;
+            pointer-events: none;
+            z-index: 10;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            max-width: 80%;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        #instruction {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255,255,255,0.6);
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            pointer-events: none;
+            font-family: monospace;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-family: monospace;
+            transition: 0.2s;
+            pointer-events: auto;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: cyan;
+            box-shadow: 0 0 12px cyan;
+        }
+        @media (max-width: 600px) {
+            #poem { font-size: 1.2rem; bottom: 10%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="back-btn" onclick="location.href='index.html'">✨ 返回星云</div>
+    <div id="poem">✨ 轻触镜面，诗句流转 ✨</div>
+    <div id="instruction">🖱️ 鼠标拖拽旋转视角 | 点击任意处 → 新诗句 + 镜面变色</div>
+
+    <!-- 引入Three.js核心库及扩展 -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        
+        // --- 初始化场景 ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x010120);
+        scene.fog = new THREE.FogExp2(0x010120, 0.008);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(2, 2, 5);
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+        
+        // 后期发光
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.4, 0.85);
+        bloomPass.threshold = 0.1;
+        bloomPass.strength = 0.9;
+        bloomPass.radius = 0.8;
+        const effectComposer = new EffectComposer(renderer);
+        effectComposer.addPass(renderScene);
+        effectComposer.addPass(bloomPass);
+        
+        // --- 核心：镜面立方体（无限反射感）---
+        // 创建一个大立方体，内部贴图使用 CubeTextureLoader 会复杂，改用 6个平面反射材质 + 镜面高光
+        // 更简单且惊艳：建立一个球体网格 + 内外颠倒材质？不，使用 MeshStandardMaterial 高 metalness
+        
+        // 1) 中央悬浮几何体：一个扭曲的环面结 (TorKnot) 并镀铬材质
+        const geometry = new THREE.TorusKnotGeometry(0.9, 0.22, 180, 24, 3, 4);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x88aaff,
+            metalness: 0.95,
+            roughness: 0.2,
+            emissive: 0x112233,
+            emissiveIntensity: 0.5
+        });
+        const knot = new THREE.Mesh(geometry, material);
+        scene.add(knot);
+        
+        // 2) 围绕环面结的粒子光环（增加神秘感）
+        const particleCount = 2000;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePos = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const r = 1.4 + Math.random() * 0.3;
+            particlePos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+            particlePos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+            particlePos[i*3+2] = r * Math.cos(phi);
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+        const particleMat = new THREE.PointsMaterial({
+            color: 0xff88cc,
+            size: 0.02,
+            blending: THREE.AdditiveBlending
+        });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+        
+        // 3) 镜面地面（模拟无限反射板）
+        const planeMat = new THREE.MeshStandardMaterial({
+            color: 0x88aaff,
+            metalness: 0.98,
+            roughness: 0.1,
+            envMapIntensity: 1.2
+        });
+        const groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), planeMat);
+        groundPlane.rotation.x = -Math.PI / 2;
+        groundPlane.position.y = -1.2;
+        scene.add(groundPlane);
+        
+        // 环绕的镜面柱体（产生反射幻影）
+        const pillarMat = new THREE.MeshStandardMaterial({ color: 0xcc88ff, metalness: 0.9, roughness: 0.2 });
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 1.2, 8), pillarMat);
+            pillar.position.set(Math.cos(angle) * 1.8, -0.6, Math.sin(angle) * 1.8);
+            scene.add(pillar);
+        }
+        
+        // 环境光 + 点光源 + 镜面高光
+        const ambient = new THREE.AmbientLight(0x222222);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(2, 3, 4);
+        scene.add(mainLight);
+        const backLight = new THREE.PointLight(0x66aaff, 0.6);
+        backLight.position.set(-1, 1, -2);
+        scene.add(backLight);
+        const fillLight = new THREE.PointLight(0xff66cc, 0.4);
+        fillLight.position.set(1, 2, 1);
+        scene.add(fillLight);
+        
+        // --- 控制：允许用户拖拽旋转视角，增强“镜屋”探索感 ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = false;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.0;
+        controls.rotateSpeed = 1.0;
+        
+        // --- 诗句库（足够梦幻）---
+        const poems = [
+            "✨ 繁星从镜中醒来，看见了自己 ✨",
+            "🌙 每一面反射都是未说出口的梦 🌙",
+            "🌀 时间在环面结里打了一个永恒的结 🌀",
+            "🌸 你的目光所及，万物开始发光 🌸",
+            "🌊 在无限镜屋，一滴水包含了整个宇宙 🌊",
+            "🔥 火焰与冰晶共舞，名为‘此刻’ 🔥",
+            "🍃 风吹过镜面，带走了一千个谎言 🍃",
+            "💎 钻石般的孤独，折射出七彩共鸣 💎"
+        ];
+        
+        const poemDiv = document.getElementById('poem');
+        let currentPoemIndex = 0;
+        
+        // 更换诗句 + 改变环境和材质颜色
+        function changePoemAndColors() {
+            currentPoemIndex = (currentPoemIndex + 1) % poems.length;
+            poemDiv.style.opacity = '0';
+            setTimeout(() => {
+                poemDiv.textContent = poems[currentPoemIndex];
+                poemDiv.style.opacity = '1';
+            }, 200);
+            
+            // 随机改变主色调 (让镜面颜色流动)
+            const hue = Math.random();
+            const mainColor = new THREE.Color().setHSL(hue, 0.8, 0.6);
+            knot.material.color = mainColor;
+            groundPlane.material.color = mainColor;
+            // 改变粒子颜色
+            const newParticleColor = new THREE.Color().setHSL((hue + 0.5) % 1, 0.9, 0.7);
+            particleMat.color = newParticleColor;
+            // 改变背景光颜色
+            backLight.color.setHSL(hue, 0.7, 0.5);
+            fillLight.color.setHSL((hue + 0.3) % 1, 0.8, 0.6);
+            
+            // 小动画：环面结轻微缩放
+            knot.scale.setScalar(1 + Math.random() * 0.05);
+            setTimeout(() => { knot.scale.setScalar(1); }, 200);
+        }
+        
+        // 点击任意位置触发新诗句 & 色彩变化
+        window.addEventListener('click', (e) => {
+            // 防止点击返回按钮时触发两次（按钮的冒泡）
+            if (e.target.classList && e.target.classList.contains('back-btn')) return;
+            changePoemAndColors();
+        });
+        
+        // 自动每隔8秒换个诗句，营造持续惊喜
+        setInterval(() => {
+            changePoemAndColors();
+        }, 8000);
+        
+        // --- 动画：让环面结自转，粒子环绕 ---
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.012;
+            
+            knot.rotation.x = time * 0.5;
+            knot.rotation.y = time * 0.8;
+            particles.rotation.y = time * 0.2;
+            particles.rotation.x = Math.sin(time * 0.3) * 0.2;
+            
+            controls.update(); // 更新轨道控制
+            effectComposer.render();
+        }
+        
+        animate();
+        
+        // 窗口适配
+        window.addEventListener('resize', onResize);
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            effectComposer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        console.log('%c🪞 无限镜屋已开启 | 点击切换诗句与色彩 🪞', 'color: cyan; font-size: 14px;');
+    </script>
+</body>
+</html>
